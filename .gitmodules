@@ -1,0 +1,3 @@
+[submodule "external/printf"]
+	path = external/printf
+	url = git@github.com:mpaland/printf.git
