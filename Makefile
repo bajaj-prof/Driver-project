@@ -7,16 +7,16 @@ TOOLS_DIR = ${TOOLS_PATH}
 MSPGCC_ROOT_DIR = $(TOOLS_DIR)/msp430-gcc-9.3.1.11_linux64
 MSPGCC_BIN_DIR = $(MSPGCC_ROOT_DIR)/bin
 MSPGCC_INCLUDE_DIR = $(MSPGCC_ROOT_DIR)/include
-INCLUDE_DIRS = $(MSPGCC_INCLUDE_DIR) \
+INCLUDE_DIRS = $(MSPGCC_INCLUDE_DIR)\
 				./src \
-				./external \
+				./external/ \
 				.external/printf
 				
 LIB_DIRS = $(MSPGCC_INCLUDE_DIR)
 BUILD_DIR = builds
 OBJ_DIR = $(BUILD_DIR)/obj
 BIN_DIR = $(BUILD_DIR)/bin
-TI_CCS_DIR = $(TOOLS_DIR)/ccs1260/ccs
+TI_CCS_DIR = /home/vishalb/ti/ccs1260/ccs
 DEBUG_BIN_DIR = $(TI_CCS_DIR)/ccs_base/DebugServer/bin
 DEBUG_DRIVERS_DIR = $(TI_CCS_DIR)/ccs_base/DebugServer/drivers
 
@@ -28,19 +28,17 @@ CPPCHECK = cppcheck
 FORMAT = clang-format-12
 
 #Files
-TARGET = $(BUILD DIR)/$(TARGET_HW)/bin/$(TARGET_NAME)
+TARGET = $(BIN_DIR)/test
 
-MAIN_FILE = src/main.c
+MAIN_FILE = src/test/test.c
 
-SOURCES_WITH_HEADERS = \
-                      src/drivers/io.c
+SOURCES_WITH_HEADERS = src/drivers/io.c \
+       				  
 
-SOURCES = \
-         $(SOURCES_WITH_HEADERS)\
+SOURCES = $(SOURCES_WITH_HEADERS) \
          $(MAIN_FILE)
          
-HEADERS = \
-          $(SOURCES_WITH_HEADERS:.c=.h)\
+HEADERS = $(SOURCES_WITH_HEADERS:.c=.h) \
           src/common/defines.h \        
 
 OBJECT_NAMES = $(SOURCES:.c=.o)
@@ -60,8 +58,8 @@ HEADER_FORMAT = $(filter-out $(IGNORE_FILES_FORMAT_CPPCHECK),$(HEADERS))
 #Flags
 MCU = msp430g2553
 WFLAGS = -Wall -Wextra  -Werror -Wshadow 
-CFLAGS = -mmcu=$(MCU)  $(WFLAGS) $(addprefix -I,$(INCLUDE_DIRS)) -Og -g
-LDFLAGS = -mmcu=$(MCU) $(addprefix -L,$(LIB_DIRS)) $(addprefix -I,$(INCLUDE_DIRS))
+CFLAGS = -mmcu=$(MCU)  $(WFLAGS) $(addprefix -I,$(INCLUDE_DIRS)) -Og -g 
+LDFLAGS = -mmcu=$(MCU) $(addprefix -L,$(LIB_DIRS))
 CPPCHECK_FLAGS = \
 	--quiet --enable=all --error-exitcode=1 \
 	--inline-suppr \
@@ -73,8 +71,8 @@ CPPCHECK_FLAGS = \
 #Build
 
 #Linking
-$(TARGET): $(OBJECTS) $(HEADERS)
-	echo $(OBJECTS) 
+$(TARGET): $(OBJECTS)
+	@echo "Linking $^"
 	@mkdir -p $(dir  $@) 
 	$(CC) $(LDFLAGS) -o $@ $^
 
@@ -86,12 +84,13 @@ $(OBJ_DIR)/%.o:%.c
 
 #PHONIES
 
-.PHONY: all clean flash cppcheck format
+.PHONY: all clean flash cppcheck format headers objects target
 
 all: $(TARGET) 
 
 clean:
-	@$(RM) -rf $(BUILD_DIR)
+	$(RM) -rf $(BUILD_DIR)
+	
 flash: $(TARGET)
 	$(DEBUG) rf2500 "erase" "load $(TARGET)"
 
@@ -101,3 +100,11 @@ cppcheck:
 format:
 	$(FORMAT) -i $(SOURCES) $(HEADERS)			
 
+headers: 
+	@echo $(HEADERS)
+	
+objects:
+	@echo $(OBJECTS)	
+
+target: 
+	@echo $(TARGET)
