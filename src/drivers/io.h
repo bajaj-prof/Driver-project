@@ -7,15 +7,29 @@
 //clang-format off
 
 typedef enum {
-    IO_10,IO_11,IO_12, IO_13, IO_14, IO_15, IO_16, IO_17,
-    IO_20,IO_21, IO_22, IO_23, IO_24, IO_25, IO_26, IO_27
-}io_generic_e;
+  IO_10,
+  IO_11,
+  IO_12,
+  IO_13,
+  IO_14,
+  IO_15,
+  IO_16,
+  IO_17,
+  IO_20,
+  IO_21,
+  IO_22,
+  IO_23,
+  IO_24,
+  IO_25,
+  IO_26,
+  IO_27
+} io_generic_e;
 
 typedef enum {
-  IO_TEST_LED = IO_10, //0 (counts up from 0)
+  IO_TEST_LED = IO_10, // 0 (counts up from 0)
   IO_UART_RXD = IO_11, // 1
   IO_UART_TXD = IO_12, // 2
-  IO_UNUSED_1 = IO_13, //3
+  IO_UNUSED_1 = IO_13, // 3
   IO_UNUSED_2 = IO_14,
   IO_UNUSED_3 = IO_15,
   IO_UNUSED_4 = IO_16,
@@ -51,12 +65,11 @@ typedef enum
 { IO_IN_LOW,
   IO_IN_HIGH } io_in_e;
 
-struct io_config
-{
-      io_select_e select;
-      io_dir_e dir;
-      io_resistor_e res;
-      io_out_e out;
+struct io_config {
+  io_select_e select;
+  io_dir_e dir;
+  io_resistor_e res;
+  io_out_e out;
 };
 
 void io_configuration(io_e io, const struct io_config *config);

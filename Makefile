@@ -32,7 +32,9 @@ TARGET = $(BIN_DIR)/test
 
 MAIN_FILE = src/test/test.c
 
-SOURCES_WITH_HEADERS = src/drivers/io.c \
+SOURCES_WITH_HEADERS =	\
+	src/drivers/mcu_init.c \
+	src/drivers/io.c \
        				  
 
 SOURCES = $(SOURCES_WITH_HEADERS) \
