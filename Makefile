@@ -60,7 +60,7 @@ HEADER_FORMAT = $(filter-out $(IGNORE_FILES_FORMAT_CPPCHECK),$(HEADERS))
 #Flags
 MCU = msp430g2553
 WFLAGS = -Wall -Wextra  -Werror -Wshadow 
-CFLAGS = -mmcu=$(MCU)  $(WFLAGS) $(addprefix -I,$(INCLUDE_DIRS)) -Og -g 
+CFLAGS = -mmcu=$(MCU)  $(WFLAGS) $(addprefix -I,$(INCLUDE_DIRS)) -Og -g
 LDFLAGS = -mmcu=$(MCU) $(addprefix -L,$(LIB_DIRS))
 CPPCHECK_FLAGS = \
 	--quiet --enable=all --error-exitcode=1 \
