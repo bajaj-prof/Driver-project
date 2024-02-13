@@ -35,6 +35,9 @@ MAIN_FILE = src/test/test.c
 SOURCES_WITH_HEADERS =	\
 	src/drivers/mcu_init.c \
 	src/drivers/io.c \
+	src/drivers/uart.c \
+	src/common/ring_buffer.c 
+
        				  
 
 SOURCES = $(SOURCES_WITH_HEADERS) \
@@ -73,7 +76,7 @@ CPPCHECK_FLAGS = \
 #Build
 
 #Linking
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) 
 	@echo "Linking $^"
 	@mkdir -p $(dir  $@) 
 	$(CC) $(LDFLAGS) -o $@ $^

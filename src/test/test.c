@@ -1,9 +1,13 @@
 #include "drivers/io.h"
 #include "drivers/mcu_init.h"
+#include "drivers/uart.h"
+#include "common/defines.h"
 #include <msp430.h>
+
 
 static void test_setup(void) { mcu_init(); }
 
+SUPPRESS_UNUSED
 static void test_blink_led(void) {
   const struct io_config led_config = {.dir = IO_DIR_OUTPUT,
                                        .select = IO_SELECT_GPIO,
@@ -17,8 +21,19 @@ static void test_blink_led(void) {
     __delay_cycles(100000); // internal delay function 250 ms
   }
 }
-int main(void) {
+
+SUPPRESS_UNUSED
+static void test_uart(void) {
   test_setup(); // stop watchdog timer
-  test_blink_led();
-  return 0;
+  uart_init();
+  __enable_interrupt();
+ while(1)
+ {
+     uart_print_interrupt("Artful Bytes \n");
+ }
+}
+
+int main ()
+{
+    //TODO: Make Assert
 }
