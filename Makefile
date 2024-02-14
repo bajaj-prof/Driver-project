@@ -10,7 +10,7 @@ MSPGCC_INCLUDE_DIR = $(MSPGCC_ROOT_DIR)/include
 INCLUDE_DIRS = $(MSPGCC_INCLUDE_DIR)\
 				./src \
 				./external/ \
-				.external/printf
+				./
 				
 LIB_DIRS = $(MSPGCC_INCLUDE_DIR)
 BUILD_DIR = builds
@@ -36,7 +36,9 @@ SOURCES_WITH_HEADERS =	\
 	src/drivers/mcu_init.c \
 	src/drivers/io.c \
 	src/drivers/uart.c \
-	src/common/ring_buffer.c 
+	src/common/ring_buffer.c \
+	external/printf/printf.c \
+	src/common/trace.c 
 
        				  
 
@@ -50,6 +52,8 @@ OBJECT_NAMES = $(SOURCES:.c=.o)
 OBJECTS = $(patsubst %,$(OBJ_DIR)/%,$(OBJECT_NAMES)) 
 
 #Defines
+DEFINES = \
+	-DPRINTF_INCLUDE_CONFIG_H \
 #Static Analysis 
 #Don't check the msp430 helper headers (have a lot of ifdefs)
 CPPCHECK_INCLUDES = ./src ./
@@ -58,12 +62,13 @@ IGNORE_FILES_FORMAT_CPPCHECK = \
 		external/printf/printf.c \
 
 SOURCES_FORMAT_CPPCHECK = $(filter-out $(IGNORE_FILES_FORMAT_CPPCHECK),$(SOURCES))
+
 HEADER_FORMAT = $(filter-out $(IGNORE_FILES_FORMAT_CPPCHECK),$(HEADERS))
 
 #Flags
 MCU = msp430g2553
 WFLAGS = -Wall -Wextra  -Werror -Wshadow 
-CFLAGS = -mmcu=$(MCU)  $(WFLAGS) $(addprefix -I,$(INCLUDE_DIRS)) -Og -g
+CFLAGS = -mmcu=$(MCU)  $(WFLAGS) $(addprefix -I,$(INCLUDE_DIRS)) $(DEFINES) -Og -g 
 LDFLAGS = -mmcu=$(MCU) $(addprefix -L,$(LIB_DIRS))
 CPPCHECK_FLAGS = \
 	--quiet --enable=all --error-exitcode=1 \
@@ -103,7 +108,7 @@ cppcheck:
 	@$(CPPCHECK) $(CPPCHECK_FLAGS) $(SOURCES_FORMAT_CPPCHECK)	
 	
 format:
-	$(FORMAT) -i $(SOURCES) $(HEADERS)			
+	$(FORMAT) -i $(SOURCES_FORMAT_CPPCHECK) $(HEADERS_FORMAT)			
 
 headers: 
 	@echo $(HEADERS)
