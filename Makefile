@@ -26,6 +26,8 @@ RM = rm
 DEBUG = LD_LIBRARY_PATH=$(DEBUG_DRIVERS_DIR) $(DEBUG_BIN_DIR)/mspdebug
 CPPCHECK = cppcheck
 FORMAT = clang-format-12
+READELF = $(MSPGCC_BIN_DIR) /msp430-elf-readelf
+ADDR2LINE = $(MSPGCC_BIN_DIR)/msp430-elf-addr2line
 
 #Files
 TARGET = $(BIN_DIR)/test
@@ -38,7 +40,8 @@ SOURCES_WITH_HEADERS =	\
 	src/drivers/uart.c \
 	src/common/ring_buffer.c \
 	external/printf/printf.c \
-	src/common/trace.c 
+	src/common/trace.c \
+	src/common/assert_handler.c 
 
        				  
 
@@ -118,3 +121,6 @@ objects:
 
 target: 
 	@echo $(TARGET)
+	
+addr2line : $(TARGET)
+	@ $(ADDR2LINE) -e $(TARGET) $(ADDR)

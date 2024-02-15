@@ -2,12 +2,21 @@
 #include "drivers/mcu_init.h"
 #include "common/defines.h"
 #include "common/trace.h"
-#include <msp430.h>
 #include "external/printf/printf.h"
+#include "common/assert_handler.h"
+#include <msp430.h>
 
+SUPPRESS_UNUSED
 static void test_setup(void)
 {
     mcu_init();
+}
+
+SUPPRESS_UNUSED
+static void test_assert(void)
+{
+    test_setup();
+    ASSERT(0);
 }
 
 SUPPRESS_UNUSED
@@ -39,6 +48,8 @@ static void test_uart(void)
         BUSY_WAIT_ms(100);
     }
 }
+
+SUPPRESS_UNUSED
 static void test_trace(void)
 {
     test_setup();
@@ -52,5 +63,5 @@ static void test_trace(void)
 }
 int main()
 {
-    test_trace(); // TODO: Make Assert
+    test_assert();
 }

@@ -1,6 +1,7 @@
 #include "drivers/uart.h"
 #include "common/defines.h"
 #include "common/ring_buffer.h"
+#include "common/assert_handler.h"
 #include <msp430.h>
 #include <assert.h>
 #include <stdint.h>
@@ -51,7 +52,7 @@ static void uart_start_tx(void)
 __attribute__((interrupt(USCIAB0TX_VECTOR))) void isr_uart_tx()
 {
     if (ring_buffer_empty(&tx_buffer)) {
-        // TODO: Assert
+
         while (1)
             ;
     }
@@ -63,9 +64,8 @@ __attribute__((interrupt(USCIAB0TX_VECTOR))) void isr_uart_tx()
     uart_start_tx();
 }
 
-void uart_init()
+static void uart_configure(void)
 {
-
     UCA0CTL1 |= UCSWRST; // ENable software reset
     UCA0CTL1 |= UCSSEL_3; // Select SMCLK = 1 MHz as clock source
 
@@ -82,19 +82,29 @@ void uart_init()
     P1SEL |= BIT1 + BIT2;
     P1SEL2 |= BIT1 + BIT2;
 
-    // Setup interrupts
-    uart_clear_tx_interrupt();
-    uart_enable_tx_interrupt(); // Enable Tx interrupt
-    // Remove from software reset mode
     UCA0CTL1 &= ~UCSWRST;
+}
+
+static bool initialized = false;
+void uart_init()
+{
+    ASSERT(!initialized);
+    uart_configure();
+    // Interrupt triggers when Tx buffer is empty, which is after boot, so clear it here.
+
+    // Remove from software reset mode
+    initialized = true;
 }
 
 // mpland/printf needs this to be named as _putchar
 void _putchar(char c)
 {
+    if (c == '\n') {
+        _putchar('\r');
+    }
+
     // Poll if full
-    while (ring_buffer_full(&tx_buffer))
-        ;
+    while (ring_buffer_full(&tx_buffer)) { }
 
     uart_disable_tx_interrupt();
     const bool tx_ongoing = !ring_buffer_empty(&tx_buffer);
@@ -104,7 +114,32 @@ void _putchar(char c)
         uart_start_tx();
     }
     uart_enable_tx_interrupt();
+}
+
+void uart_putchar_polling(char c)
+{
+    while (!(IFG2 & UCA0TXIFG)) { }
+    UCA0TXBUF = c;
     if (c == '\n') {
-        _putchar('\r');
+        while (!(IFG2 & UCA0TXIFG)) { }
+        uart_putchar_polling('\r');
+    }
+}
+
+void uart_init_assert(void)
+{
+    uart_disable_tx_interrupt();
+    uart_configure();
+    // Setup interrupts
+    uart_clear_tx_interrupt();
+    uart_enable_tx_interrupt(); // Enable Tx interrupt
+}
+
+void uart_trace_assert(const char *string)
+{
+    int i = 0;
+    while (string[i] != '\0') {
+        uart_putchar_polling(string[i]);
+        i++;
     }
 }
