@@ -45,7 +45,4 @@ A special thanks to the open-source community and the creators of the tools used
 
 ---
 
-**Functional Diagram**
-![Untitled presentation (1)](https://github.com/bajaj-prof/Driver-project/assets/85208079/1cbada73-8920-4080-8f5b-a902d2a14b67)
-
 
